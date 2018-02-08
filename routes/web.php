@@ -15,6 +15,6 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->get('foo', function () {
-    return 'Hello World';
-});
+$router->get('hello/{name}', ['middleware'=>'hello',function ($name) {
+    return "Hello {$name}";
+}]);
