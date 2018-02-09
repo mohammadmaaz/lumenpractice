@@ -18,3 +18,23 @@ $router->get('/', function () use ($router) {
 $router->get('hello/{name}', ['middleware'=>'hello',function ($name) {
     return "Hello {$name}";
 }]);
+
+$router->get('/request',function (Illuminate\Http\Request $request){
+  return "Hello " . $request->get('name','stranger');
+});
+
+$router->get('/response', function (Illuminate\Http\Request $request){
+  if ($request->wantsJson()) {
+    return response()->json(['greeting' => 'Hello stranger']);
+  }
+
+  return (new Illuminate\Http\Response('Hello stranger',200))->header('Content-Type','text/plain');
+});
+
+$router->get('/responsemake', function (Illuminate\Http\Request $request){
+  if ($request->wantsJson()) {
+    return response()->json(['greeting' => 'Hello stranger']);
+  }
+
+  return response()->make('Hello stranger',200,['Content-Type' > 'text/plain']);
+});
