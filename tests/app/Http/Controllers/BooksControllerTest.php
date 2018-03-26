@@ -5,6 +5,7 @@ use Laravel\Lumen\Testing\DatabaseTransactions;
 
 class BooksControllerTest extends TestCase
 {
+    use DataBaseMigrations;
     /** @test **/
     public function index_status_code_should_be_200()
     {
@@ -13,22 +14,24 @@ class BooksControllerTest extends TestCase
     /** @test **/
     public function index_should_return_a_collection_of_records()
     {
-      $this->get('/books')
-      ->seeJson(['title'=>'War of the Worlds'])
-      ->seeJson(['title'=>'A Wrinkle in Time']);
+      $books = factory('App\Book', 2)->create();
+      $this->get('/books');
+      foreach ($books as $book) {
+          $this->seeJson(['title' => $book->title]);
+      }
     }
     /** @test **/
     public function show_should_return_a_valid_book()
     {
-      $this
-          ->get('/books/1')
+        $book = factory('App\Book')->create();
+        $this
+          ->get("/books/{$book->id}")
           ->seeStatusCode(200)
           ->seeJson([
-              'id' => 1,
-              'title' => 'War of the Worlds',
-              'description' => 'A science fiction masterpiece about Martians invading
-        London',
-              'author' => 'H. G. Wells'
+              'id' => $book->id,
+              'title' => $book->title,
+              'description' => $book->description,
+              'author' => $book->author
           ]);
       $data = json_decode($this->response->getContent(), true);
       $this->assertArrayHasKey('created_at', $data);
@@ -81,10 +84,13 @@ class BooksControllerTest extends TestCase
     /** @test **/
     public function update_should_only_change_fillable_fields()
     {
-      $this->notSeeInDatabase('books',[
-        'title' => 'The War of the Worlds'
+      $book = factory('App\Book')->create([
+          'title' => 'War of the Worlds',
+          'description' => 'A science fiction masterpiece about Martians invading London',
+          'author' => 'H. G. Wells',
       ]);
-      $this->put('books/1',[
+
+      $this->put("/books/{$book->id}",[
         'id' => 5,
         'title' => 'The War of the Worlds',
         'description' => 'The book is way better than the movie.',
@@ -120,10 +126,11 @@ class BooksControllerTest extends TestCase
     /** @test **/
     public function destory_should_remove_a_valid_book()
     {
-        $this->delete('/books/1')
+        $book = factory('App\Book')->create();
+        $this->delete("/books/{$book->id}")
         ->seeStatusCode(204)
         ->isEmpty();
-        $this->notSeeInDatabase('books',['id'=>1]);
+        $this->notSeeInDatabase('books',['id'=>$book->id]);
     }
     /** @test **/
     public function destory_should_return_a_404_with_an_invalid_id()
