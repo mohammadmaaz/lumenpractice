@@ -21,4 +21,10 @@ DELETE /books/{id} **Delete single book by id**
 
 ```
 
+```
+>Misc
+
+Handle Exceptions with a JSON Response
+
+```
 @mohammadmaaz :+1: This doc look great!
