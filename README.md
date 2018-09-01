@@ -26,5 +26,9 @@ DELETE /books/{id} **Delete single book by id**
 
 Handle Exceptions with a JSON Response
 
+Contain Book Responses in a data Attribute
+
+Add FractalResponse Class
+
 ```
 @mohammadmaaz :+1: This doc look great!
