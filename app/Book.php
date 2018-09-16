@@ -13,4 +13,11 @@ class Book extends Model
    */
   protected $fillable = ['title','description','author'];
 
+  /**
+   * The attributes that should be mutated to dates.
+   *
+   * @var array
+   */
+  protected $dates = ['create_at,update_at'];
+
 }

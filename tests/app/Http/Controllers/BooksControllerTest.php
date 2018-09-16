@@ -1,11 +1,30 @@
 <?php
 
+namespace Tests\App\Http\Controllers;
+
+use TestCase;
+use Carbon\Carbon;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Laravel\Lumen\Testing\DatabaseTransactions;
 
 class BooksControllerTest extends TestCase
 {
     use DataBaseMigrations;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        Carbon::setTestNow(Carbon::now('UTC'));
+    }
+
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        Carbon::setTestNow();
+    }
+
     /** @test **/
     public function index_status_code_should_be_200()
     {
@@ -15,20 +34,42 @@ class BooksControllerTest extends TestCase
     public function index_should_return_a_collection_of_records()
     {
       $books = factory('App\Book', 2)->create();
+
       $this->get('/books');
-      $expected = [
-          'data' => $books->toArray()
-      ];
-      $this->seeJsonEquals($expected);
+
+      $content = json_decode($this->response->getContent(), true);
+      $this->assertArrayHasKey('data', $content);
+
+      foreach ($books as $book) {
+          $this->seeJson([
+              'id' => $book->id,
+              'title' => $book->title,
+              'description' => $book->description,
+              'author' => $book->author,
+              'created' => $book->created_at->toIso8601String(),
+              'updated' => $book->updated_at->toIso8601String(),
+          ]);
+      }
     }
     /** @test **/
     public function show_should_return_a_valid_book()
     {
         $book = factory('App\Book')->create();
-        $expected = [
-            'data' => $book->toArray()
-        ];
-        $this->get("/books/{$book->id}")->seeStatusCode(200)->seeJsonEquals($expected);
+
+        $this->get("/books/{$book->id}")->seeStatusCode(200);
+
+        // Get the response and assert the data key exists
+        $content = json_decode($this->response->getContent(), true);
+        $this->assertArrayHasKey('data', $content);
+        $data = $content['data'];
+
+        // Assert the Book Properties match
+        $this->assertEquals($book->id, $data['id']);
+        $this->assertEquals($book->title, $data['title']);
+        $this->assertEquals($book->description, $data['description']);
+        $this->assertEquals($book->author, $data['author']);
+        $this->assertEquals($book->created_at->toIso8601String(), $data['created']);
+        $this->assertEquals($book->updated_at->toIso8601String(), $data['updated']);
     }
     /** @test **/
     public function show_should_fail_when_the_book_id_does_not_exist()
@@ -69,6 +110,12 @@ class BooksControllerTest extends TestCase
       );
       $this->assertEquals('H. G. Wells', $data['author']);
       $this->assertTrue($data['id'] > 0, 'Expected a positive integer, but did not see one.');
+
+      $this->assertArrayHasKey('created', $data);
+      $this->assertEquals(Carbon::now()->toIso8601String(), $data['created']);
+      $this->assertArrayHasKey('updated', $data);
+      $this->assertEquals(Carbon::now()->toIso8601String(), $data['updated']);
+
       $this->seeInDatabase('books',['title' => 'The Invisible Man']);
     }
     /** @test **/
@@ -117,6 +164,12 @@ class BooksControllerTest extends TestCase
       // Verify the data key in the response
       $body = json_decode($this->response->getContent(), true);
       $this->assertArrayHasKey('data',$body);
+
+      $data = $body['data'];
+      $this->assertArrayHasKey('created', $data);
+      $this->assertEquals(Carbon::now()->toIso8601String(), $data['created']);
+      $this->assertArrayHasKey('updated', $data);
+      $this->assertEquals(Carbon::now()->toIso8601String(), $data['updated']);
     }
     /** @test **/
     public function update_should_fail_with_an_invalid_id()

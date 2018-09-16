@@ -30,5 +30,7 @@ Contain Book Responses in a data Attribute
 
 Add FractalResponse Class
 
+Integrate the FractalResponse Service
+
 ```
 @mohammadmaaz :+1: This doc look great!

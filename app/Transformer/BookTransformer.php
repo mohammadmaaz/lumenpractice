@@ -20,10 +20,8 @@ class BookTransformer extends TransformerAbstract
             'title'         => $book->title,
             'description'   => $book->description,
             'author'        => $book->author,
-            // 'created'       => $book->create_at->toIso8601String(),
-            'created'       => $book->create_at,
-            // 'updated'       => $book->update_at->toIso8601String(),
-            'updated'       => $book->update_at,
+            'created'       => $book->created_at->toIso8601String(),
+            'updated'       => $book->updated_at->toIso8601String(),
         ];
     }
 }
