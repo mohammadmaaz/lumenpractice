@@ -32,5 +32,7 @@ Add FractalResponse Class
 
 Integrate the FractalResponse Service
 
+Add Book API Validation
+
 ```
 @mohammadmaaz :+1: This doc look great!
