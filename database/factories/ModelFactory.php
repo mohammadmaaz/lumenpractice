@@ -15,7 +15,14 @@ $factory->define(App\Book::class, function (Faker\Generator $faker) {
     $title = $faker->sentence(rand(3, 10));
     return [
         'title' => substr($title, 0, strlen($title) - 1),
-        'description' => $faker->text,
-        'author' => $faker->name
+        'description' => $faker->text
+    ];
+});
+
+$factory->define(App\Author::class, function ($faker) {
+    return [
+        'name' => $faker->name,
+        'biography' => join(" ",$faker->sentences(rand(3, 5))),
+        'gender' => rand(1, 6) % 2 === 0 ? 'male' : 'female'
     ];
 });

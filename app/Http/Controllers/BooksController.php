@@ -41,7 +41,7 @@ class BooksController extends Controller
       $this->validate($request, [
           'title' => 'required|max:255',
           'description' => 'required',
-          'author' => 'required'
+          'author_id' => 'required|exists:authors,id'
       ], [
           'description.required' => 'Please provide a :attribute.'
       ]);
@@ -75,9 +75,9 @@ class BooksController extends Controller
     $this->validate($request, [
         'title' => 'required|max:255',
         'description' => 'required',
-        'author' => 'required'
+        'author_id' => 'exists:authors,id'
     ], [
-        'description.required' => 'Please provide a :attribute.' 
+        'description.required' => 'Please provide a :attribute.'
     ]);
 
     $book->fill($request->all());
